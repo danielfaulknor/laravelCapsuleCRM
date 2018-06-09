@@ -125,4 +125,21 @@ class Party extends CapsulecrmManager
 
         return false;
     }
+    
+     /**
+     * Get all Parties
+     *
+     * @return mix (false if email not exist otherwise return user id)
+     */
+    public function all()
+    {
+        $query = $this->url;
+        $response = $this->get(false, $query);
+        checkResponseException($response);
+        if (count($response->parties)) {
+            return $response->parties;
+        }
+
+        return false;
+    }
 }
