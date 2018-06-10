@@ -63,10 +63,9 @@ class Party extends CapsulecrmManager
      * @param array $data
      * @return int|ClientException|Response
      */
-    public function update($id, array $data)
+    public function update($id, $data)
     {
-        $url = $this->url."/$id";
-
+          $url = $this->url."/$id";
         return $this->put($data, $url);
     }
 
@@ -107,7 +106,7 @@ class Party extends CapsulecrmManager
 
         return true;
     }
-    
+
     /**
      * Search For Party by any $filter on Capsule
      *
@@ -125,7 +124,7 @@ class Party extends CapsulecrmManager
 
         return false;
     }
-    
+
      /**
      * Get all Parties
      *
@@ -133,13 +132,43 @@ class Party extends CapsulecrmManager
      */
     public function all()
     {
-        $query = $this->url;
+        $i = 1;
+        $obj_merged = new \stdClass();
+        do {
+          $query = $this->url . "?perPage=100&page=".$i;
+          $response = $this->get(false, $query);
+          checkResponseException($response);
+          if ($response->parties) {
+              $obj_merged = (object) array_merge((array) $obj_merged, (array) $response->parties);
+          }
+          else {
+            return $obj_merged;
+          }
+          $i++;
+        } while (true);
+
+        return false;
+    }
+
+    public function fetch($party_id)
+    {
+        $query = $this->url."/$party_id";
+        $response = $this->get(false, $query);
+        checkResponseException($response);
+        if ($response->party) {
+            return $response->party;
+        }
+        return false;
+    }
+
+    public function people($party_id)
+    {
+        $query = $this->url."/$party_id/people";
         $response = $this->get(false, $query);
         checkResponseException($response);
         if (count($response->parties)) {
             return $response->parties;
         }
-
         return false;
     }
 }
